@@ -1,5 +1,6 @@
 const settings = require('./utils/settings.json')
 const projectCreator = require('./utils/project-creator.js')
+const projectDestroyer = require('./utils/project-destroyer.js')
 const state = require('./utils/state.js')
 const puppeteer = require('puppeteer')
 
@@ -15,8 +16,8 @@ async function start() {
         return 
     }
 
-    await createAllProjectsAndCredentials(userName)
-    //await deleteAllProjects(userName)
+    //await createAllProjectsAndCredentials(userName)
+    await deleteAllProjects(userName)
 
     async function createAllProjectsAndCredentials(userName) {
         (async() => {
@@ -40,6 +41,20 @@ async function start() {
                 console.log('> project saved')
             }
         
+            await browser.close();
+        })();
+    }
+
+    async function deleteAllProjects(userName) {
+        (async() => {
+            const browser = await puppeteer.launch({
+                headless: false
+            });
+            const page = await browser.newPage();
+
+            await projectCreator.loginGoogleApiConsole(userName, page)
+            await projectDestroyer.destroyAllProjects(page)
+
             await browser.close();
         })();
     }
